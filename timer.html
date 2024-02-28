@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Timer</title>
+</head>
+	<style type="text/css">
+		body{
+			outline: 0; border: 0;
+			font-family: Poppins, arial;
+			background: #f4f4f4;
+			color: #fff;
+			text-align: center;
+			padding-top: 20px;
+		}
+
+		.main-container{
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+		}
+
+		.input-container{
+			margin-bottom: 20px;
+			width: auto;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 25px;
+			padding: 10px 15px;
+			flex-wrap: wrap;
+		}
+		.input-hours,
+		.input-minutes,
+		.input-seconds{
+			width: 65px;
+			padding: 8px 12px;
+			font-size: 12px;
+			color: #000000;
+			background: none;
+			border: 1px solid rgba(19, 19, 19, 0.5);
+			outline: none;
+			margin-left: 10px;
+			border-radius: 25px;
+		}
+
+
+		.btn{
+			background: rgba(19, 19, 19) ;
+			color: #ffffff;
+			font-size: 13px;
+			padding: 8px 18px;
+			border: none;
+			outline: none;
+			margin-left: 10px;
+			border-radius: 25px;
+			width: 70px;
+			transition: .2s ease all;
+			cursor: pointer;
+		}
+
+		.time-container{
+			background: #f4f4f4;
+			border: none;
+			outline: none;
+			padding: 20px;
+			width: auto;
+			height: auto;
+			margin-top: 20px;
+			box-shadow: 0 1px 15px 1px rgba(19, 19, 19, 0.1);
+			margin-bottom: 40px;
+			border-radius: 80px ;
+
+		}
+
+		.time-container .container{
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 5rem;
+			color: #000000;
+			width: 350px;
+		}
+
+		.time-container .container span{
+			width: 120px;
+		}
+
+
+	</style>
+<body>
+
+	<!-- Stop Watch container -->
+
+	<main class="main-container">
+		<div class="input-container">
+			<input type="number" class="input-hours" min="0" max="23" placeholder="Hours">
+			<input type="number" class="input-minutes" min="0" max="60" placeholder="Minutes">
+			<input type="number" class="input-seconds" min="0" max="60" placeholder="Seconds">
+			<button class="start-button btn">Set</button>
+		</div>
+		<div class="time-container">
+			<div class="container">
+				<span class="count-hours">00</span>:
+				<span class="count-minutes">00</span>:
+				<span class="count-seconds">00</span>
+			</div>
+		</div>
+		<div class="buttons">
+			<button class="play-button btn">Play</button>
+			<button class="reset-button btn">Reset</button>
+		</div>
+	</main>
+
+
+
+
+	<script type="text/javascript">
+		
+
+		// variables
+		let inputHoursEl = document.querySelector('.input-hours');
+		let inputMinutesEl = document.querySelector('.input-minutes');
+		let inputSecondsEl = document.querySelector('.input-seconds');
+
+		let startButtonEl = document.querySelector('.start-button');
+		
+		let countHoursEl = document.querySelector('.count-hours');
+		let countMinutesEl = document.querySelector('.count-minutes');
+		let countSecondsEl = document.querySelector('.count-seconds');
+
+		let playButtonEl = document.querySelector('.play-button');
+		let resetButtonEl = document.querySelector('.reset-button');
+
+		// disable  the buttons by default
+		startButtonEl.disabled = true; 
+		resetButtonEl.disabled = true;
+		playButtonEl.disabled = true;
+
+		// change styles when the button is disabled to show freeze effect
+
+		if(startButtonEl.disabled){
+			startButtonEl.style.background = '#cccccc';
+			playButtonEl.style.background = '#cccccc';
+			resetButtonEl.style.background = '#cccccc';
+
+			startButtonEl.disabled = true;
+		}
+
+		// Activate the start button on input key up
+
+		document.querySelectorAll('input').forEach(input => {
+			input.addEventListener('keyup', () => {
+				startButtonEl.disabled = false;
+				startButtonEl.style.background = 'rgb(19, 19, 19)';
+
+			});
+		});
+
+		// Take the input values and save them in a variable
+
+		let minutes = 0,
+			hours = 0,
+			seconds = 0;
+
+		// Add the input values to the DOM after clicking the start button;
+		startButtonEl.addEventListener('click', () => {
+			 hours = inputHoursEl.value;
+			 minutes = inputMinutesEl.value;
+			 seconds = inputSecondsEl.value;
+
+			 
+			// add zero
+			hours = addZero(hours);
+			minutes = addZero(minutes);
+			seconds = addZero(seconds)
+
+			countHoursEl.textContent = hours;
+			countMinutesEl.textContent = minutes;
+			countSecondsEl.textContent = seconds;
+
+			// reset input
+			inputHoursEl.value = '';
+			inputMinutesEl.value = '';
+			inputSecondsEl.value = '';
+
+			// Disable start button after input
+			startButtonEl.disabled = true;
+			startButtonEl.style.background = '#cccccc';
+
+			// Enable Reset and Play buttons
+			resetButtonEl.disabled = false;
+			playButtonEl.disabled = false;
+
+			playButtonEl.style.background = 'rgb(19, 19, 19)';
+			resetButtonEl.style.background = 'rgb(19, 19, 19)';
+
+		});
+
+		let isCounting = false;
+		let intervalId;
+
+		// Start the watch button clicked
+		playButtonEl.addEventListener('click', () => {
+			if(!isCounting){
+				intervalId = setInterval(function(){
+
+				// After adding zero to the numbers they are converted to string then we need to Convert the string back to numbers
+		
+				seconds = Number(seconds);
+				minutes = Number(minutes);
+				hours = Number(hours);
+
+					if (hours === 0 && (minutes === 0 && seconds === 0))	{
+						hours = 0;
+						minutes = 0;
+						seconds = 0;
+
+					} else if(seconds > 0 && seconds <= 60){
+
+						seconds --;
+
+					}else if (minutes > 0 && seconds === 0){
+						seconds = 59;
+						minutes -- ;
+						
+
+					}else if (hours > 0 && minutes === 0 || seconds >= 0){
+						seconds = 59;
+						minutes = 59;
+						hours --;
+					}
+
+					seconds = addZero(seconds);
+					minutes = addZero(minutes);
+					hours = addZero(hours);
+
+					countSecondsEl.textContent = seconds;
+					countMinutesEl.textContent = minutes;
+					countHoursEl.textContent = hours;
+
+					playButtonEl.innerHTML = 'Pause';
+
+				}, 1000);
+
+				isCounting = true;
+
+			}else{
+
+				clearInterval(intervalId);
+				isCounting = false;
+				playButtonEl.innerHTML = 'Play';
+
+			}
+
+			
+		});
+
+		// Disable reset button
+		if(playButtonEl.innerHTML === 'Pause'){
+			resetButtonEl.disabled = true;
+			resetButtonEl.style.background = '#cccccc';
+		}
+
+		// reset watch button clicked
+		resetButtonEl.addEventListener('click', () => {
+
+			hours = 0;
+			minutes = 0;
+			seconds = 0;
+
+			// add zero
+			hours = addZero(hours);
+			minutes = addZero(minutes);
+			seconds = addZero(seconds);
+
+			countMinutesEl.innerText = minutes;
+			countSecondsEl.innerText = seconds;
+			countHoursEl.innerText = hours;
+
+			clearInterval(intervalId);
+			isPlaying = false;	
+
+			resetButtonEl.disabled = true;
+			playButtonEl.disabled = true;
+			playButtonEl.style.background = '#cccccc';
+			resetButtonEl.style.background = '#cccccc';
+			playButtonEl.innerHTML = 'Play';
+
+		});
+
+		// Add zero function when the numbers are less than 10
+
+		function addZero(zero){
+			if(zero >= 0 && zero < 10){
+				zero = '0' + zero;
+			}
+
+			return zero;
+		}
+
+		// Watch settings
+
+	</script>
+</body>
+</html>
